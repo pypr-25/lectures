@@ -15,7 +15,6 @@
         "jupyter-notebook": "hidden"
     },
     "notebook.globalToolbar": false,
-    "notebook.experimental.outputScrolling": true,
     "notebook.consolidatedRunButton": true,
 
     "chat.disableAIFeatures": true,
@@ -29,5 +28,6 @@
     "jupyter.executionAnalysis.enabled": false,
     "workbench.settings.showAISearchToggle": false,
     "notebook.experimental.generate": false,
-    "python.experiments.enabled": false
+    "python.experiments.enabled": false,
+    "notebook.output.scrolling": true
 }

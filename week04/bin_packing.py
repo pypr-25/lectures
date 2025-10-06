@@ -8,7 +8,28 @@ def first_fit(item_list, bin_size):
     Output:
         bins (list): a list of bins with what's inside of each bin at the end.
     '''
-    pass
+    # Start a list of bins
+    bins = [0]
+
+    # Sort items by decreasing size
+    sorted_items = sorted(item_list, reverse=True)
+
+    # Loop over the items
+    for item in item_list:
+        # Loop over the open bins
+        for b in range(len(bins)):
+
+            # Does the item fit?
+            if item + bins[b] <= bin_size:
+                # Yes, place the item
+                bins[b] += item
+        
+        # If item has not been placed,
+        # start a new bin and place it there
+        if ...:
+            bins.append(item)
+
+    return bins
 
 
 
@@ -29,3 +50,4 @@ bins_expected = [4, 4, 4, 3]
 # but raises an error if X is False, optionally with an error message (string)
 msg = f'Incorrect result: expected {bins_expected}, got {bins_result} instead.'
 assert bins_result == bins_expected, msg
+print('Test passed.')
