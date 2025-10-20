@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def first_fit(item_list, bin_size, method='decreasing'):
     '''
@@ -74,11 +75,27 @@ def first_fit(item_list, bin_size, method='decreasing'):
 # Count the number of bins used for the 3 different methods.
 
 # Generate lots of items
-number_of_sets = 100
-number_of_items = 30
-bin_sizes = 5 * np.random.rand(number_of_sets) + 5
+number_of_sets = 5000
+number_of_items = 50
+# bin_sizes = 5 * np.random.rand(number_of_sets) + 5
+bin_sizes = 10 * np.ones(number_of_sets)
 
 item_sets = 10 * np.random.rand(number_of_sets, number_of_items)
+
+number_of_bins = np.zeros((number_of_sets, 3))
+
+# Improvements:
+
+# Starting with this, improve the code below to avoid repetition.
+# methods = ['decreasing', 'increasing', 'none']
+
+# Structure this code into a set of functions.
+# Example: get results for the 3 different methods; generate the test data;
+# do the plotting... Main function at the end to call all your previous functions.
+
+# Display the results using box plots.
+
+# Display meaningful results using random bin sizes.
 
 for i in range(number_of_sets):
     bins_decreasing = first_fit(item_sets[i, :], bin_sizes[i], method='decreasing')
@@ -86,4 +103,20 @@ for i in range(number_of_sets):
     bins_none = first_fit(item_sets[i, :], bin_sizes[i], method='none')
 
     # Which uses the fewest bins?
-    # ...
+    number_of_bins[i, 0] = len(bins_decreasing)
+    number_of_bins[i, 1] = len(bins_increasing)
+    number_of_bins[i, 2] = len(bins_none)
+
+# print(number_of_bins)
+
+# Visualise results for the 3 different methods
+fig, ax = plt.subplots()
+ax.hist(number_of_bins[:, 0], alpha=0.5, label='Decreasing')
+ax.hist(number_of_bins[:, 1], alpha=0.5, label='Increasing')
+ax.hist(number_of_bins[:, 2], alpha=0.5, label='No sorting')
+ax.tick_params(labelsize=20)
+
+ax.set(xlabel='Number of bins', ylabel='Frequency')
+ax.legend()
+
+plt.show()
