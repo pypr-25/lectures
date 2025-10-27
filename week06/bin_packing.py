@@ -55,72 +55,97 @@ def first_fit(item_list, bin_size, method='decreasing'):
     return bins
 
 
-
-
-# ## Testing
-
-# # List of item sizes
-# item_list = [2, 1, 3, 2, 1, 2, 3, 1]
-
-# # Size of bin
-# bin_size = 4
-
-# # Call our function to get the result
-# bins_result = first_fit(item_list, bin_size)
-# bins_expected = [4, 4, 4, 3]
-
-# # "assert X, error_message" does nothing if X is True,
-# # but raises an error if X is False, optionally with an error message (string)
-# msg = f'Incorrect result: expected {bins_expected}, got {bins_result} instead.'
-# assert bins_result == bins_expected, msg
-# print('Test passed.')
-
-
-## Which method is better: sorting up, down, or not?
-# Count the number of bins used for the 3 different methods.
-
-# Generate lots of items
-number_of_sets = 5000
-number_of_items = 50
-# bin_sizes = 5 * np.random.rand(number_of_sets) + 5
-bin_sizes = 10 * np.ones(number_of_sets)
-
-item_sets = 10 * np.random.rand(number_of_sets, number_of_items)
-
-number_of_bins = np.zeros((number_of_sets, 3))
-
-# Improvements:
-
-# Starting with this, improve the code below to avoid repetition.
-# methods = ['decreasing', 'increasing', 'none']
-
-# Structure this code into a set of functions.
-# Example: get results for the 3 different methods; generate the test data;
-# do the plotting... Main function at the end to call all your previous functions.
-
-# Display the results using box plots.
-
-# Display meaningful results using random bin sizes.
-
-
-# Set up to loop over methods
-methods = ['decreasing', 'increasing', 'none']
-fig, ax = plt.subplots(figsize=(12, 8))
-
-# Use enumerate() to get the method name and the index together
-for j, m in enumerate(methods):
-
-    for i in range(number_of_sets):
-        # Pack current item set with current method
-        bins = first_fit(item_sets[i, :], bin_sizes[i], method=m)
-
-        # Count number of bins used
-        number_of_bins[i, j] = len(bins)
+def test_first_fit(item_list, bin_size, bins_expected):
+    '''
+    Convenience function to test that first_fit() is correct
+    in just one line.
+    '''
+    # Call our function to get the result
+    bins_result = first_fit(item_list, bin_size)
     
-    # Visualise results for the current method
-    ax.hist(number_of_bins[:, j], alpha=0.5, label=m)
+    msg = f'Incorrect result: expected {bins_expected}, got {bins_result} instead.'
+    assert bins_result == bins_expected, msg
+    print('Test passed.')
 
-ax.set(xlabel='Number of bins', ylabel='Frequency', title='Comparing different sorting methods for first fit')
-ax.legend()
 
-plt.show()
+def generate_test_data(number_of_sets=1000, number_of_items=50, max_item_size=10):
+    '''
+    Convenience function to generate some test data
+    for evaluating our different first_fit methods.
+    '''
+    # Generate all the item sets in a Numpy array
+    item_sets = max_item_size * np.random.rand(number_of_sets, number_of_items)
+
+    # Bin size is always the same; set it to max_item_size
+    bin_sizes = max_item_size * np.ones(number_of_sets)
+    
+    return item_sets, bin_sizes
+
+
+# Note: you could also break this down further, e.g. have this function return
+# the efficiency array, then have another function to calculate some summary statistics,
+# and another function to just plot the results...
+def compare_efficiency(item_sets, bin_sizes, metric='number_of_bins'):
+    '''
+    Compare packing efficiency of our 3 different methods, using
+    the provided item sets and bin sizes.
+
+    Choose metric between number of bins and % empty space.
+    '''
+    # Exercise: add robustness checks here to make sure
+    # that we have as many bin_sizes as we have item sets.
+    
+    # Set up empty arrays to store our results
+    number_of_sets = item_sets.shape[0]
+    efficiency = np.zeros((number_of_sets, 3))
+    percentage_empty_space = np.zeros((number_of_sets, 3))
+
+    # Set up to loop over methods
+    methods = ['decreasing', 'increasing', 'none']
+    fig, ax = plt.subplots(figsize=(12, 8))
+
+    # Use enumerate() to get the method name and the index together
+    for j, m in enumerate(methods):
+
+        for i in range(number_of_sets):
+            # Pack current item set with current method
+            bins = first_fit(item_sets[i, :], bin_sizes[i], method=m)
+            if any([b > bin_sizes[i] for b in bins]):
+                print(bins, bin_sizes[i], m)
+
+            if metric == 'number_of_bins':
+                # Count number of bins used
+                efficiency[i, j] = len(bins)
+
+            elif metric == 'empty_space':
+                # Calculate the % of empty space across all bins
+                # (this is more useful if the bin size is randomised, as it's normalised)
+                total_bin_space = bin_sizes[i] * len(bins)
+                efficiency[i, j] = 100 * (total_bin_space - sum(bins)) / total_bin_space
+            
+            else:
+                raise ValueError(f'metric should be "number_of_bins" or "empty_space", not {metric}.')
+        
+
+        # Visualise results for the current method
+        ax.hist(efficiency[:, j], alpha=0.5, label=m)
+
+    ax.set(xlabel=metric, ylabel='Frequency', title='Comparing different sorting methods for first fit')
+    ax.legend()
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    # Testing the function
+    # test_first_fit([2, 1, 3, 2, 1, 2, 3, 1], 4, [4, 4, 4, 3])
+
+    # Comparing efficiency of 3 methods.
+    # Setting up the test data
+    number_of_sets = 5000
+    number_of_items = 50
+    max_item_size = 10
+    item_sets, bin_sizes = generate_test_data(number_of_sets, number_of_items, max_item_size)
+
+    # Calculating and displaying efficiency
+    compare_efficiency(item_sets, bin_sizes, metric='empty_space')
