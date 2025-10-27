@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Setting the font size for all plots
+# https://matplotlib.org/stable/users/explain/customizing.html#runtime-rc-settings
+import matplotlib as mpl
+mpl.rcParams['font.size'] = 18
+
 def first_fit(item_list, bin_size, method='decreasing'):
     '''
     First-fit algorithm for the bin packing problem.
@@ -97,26 +102,25 @@ number_of_bins = np.zeros((number_of_sets, 3))
 
 # Display meaningful results using random bin sizes.
 
-for i in range(number_of_sets):
-    bins_decreasing = first_fit(item_sets[i, :], bin_sizes[i], method='decreasing')
-    bins_increasing = first_fit(item_sets[i, :], bin_sizes[i], method='increasing')
-    bins_none = first_fit(item_sets[i, :], bin_sizes[i], method='none')
 
-    # Which uses the fewest bins?
-    number_of_bins[i, 0] = len(bins_decreasing)
-    number_of_bins[i, 1] = len(bins_increasing)
-    number_of_bins[i, 2] = len(bins_none)
+# Set up to loop over methods
+methods = ['decreasing', 'increasing', 'none']
+fig, ax = plt.subplots(figsize=(12, 8))
 
-# print(number_of_bins)
+# Use enumerate() to get the method name and the index together
+for j, m in enumerate(methods):
 
-# Visualise results for the 3 different methods
-fig, ax = plt.subplots()
-ax.hist(number_of_bins[:, 0], alpha=0.5, label='Decreasing')
-ax.hist(number_of_bins[:, 1], alpha=0.5, label='Increasing')
-ax.hist(number_of_bins[:, 2], alpha=0.5, label='No sorting')
-ax.tick_params(labelsize=20)
+    for i in range(number_of_sets):
+        # Pack current item set with current method
+        bins = first_fit(item_sets[i, :], bin_sizes[i], method=m)
 
-ax.set(xlabel='Number of bins', ylabel='Frequency')
+        # Count number of bins used
+        number_of_bins[i, j] = len(bins)
+    
+    # Visualise results for the current method
+    ax.hist(number_of_bins[:, j], alpha=0.5, label=m)
+
+ax.set(xlabel='Number of bins', ylabel='Frequency', title='Comparing different sorting methods for first fit')
 ax.legend()
 
 plt.show()
