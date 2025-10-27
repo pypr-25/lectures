@@ -1,8 +1,11 @@
 import numpy as np
 import pandas as pd
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 # Code adapted from wordcloud package examples.
 # https://github.com/amueller/word_cloud/tree/main
+# https://amueller.github.io/word_cloud/auto_examples/simple.html#sphx-glr-auto-examples-simple-py
 # Accessed 27/10/2025.
 
 # More examples with analysing (messy) text data
@@ -108,8 +111,55 @@ def scramble_words(filename, output_suffix='_scrambled'):
         f.write(new_text)
 
 
+def make_word_cloud(filename):
+    # Read the whole text.
+    # text = open(filename).read()
+    with open(filename, 'r') as f:
+        text = f.read()
+    
+    students = text.split('\n')
+    # print(students[2])
+    # print(students)
+
+    # lec_pos = ''
+    # lec_neg = ''
+    all_questions = {'Lecture positives': '',
+                     'Lecture negatives': '',
+                     'Materials positives': '',
+                     'Materials negatives': '',
+                     'Workshops positives': '',
+                     'Workshops negatives': ''}
+
+    for s in students[:-1]:
+        answers = s.strip('\t\n ').split('\t')
+        # print(len(answers))
+        # print(answers)
+        
+        for i, q in enumerate(all_questions.keys()):
+            all_questions[q] += answers[i]
+        
+    # print(all_questions)
+
+
+    for i, q in enumerate(all_questions.keys()):
+
+        # Generate a word cloud image
+        wordcloud = WordCloud().generate(all_questions[q])
+
+        # Display the generated image:
+        # the matplotlib way:
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis("off")
+        plt.show()
+
+    # Future work:
+    # - Label the word clouds, put them in the same figure
+    # - Remove some specific words we're not interested in
+    # - Clean up the quotation marks
+    # - Set up dictionary by reading the first line
+
 if __name__ == "__main__":
-    pass
+    make_word_cloud('Mid-semester feedback_tabs_scrambled.csv')
 
     # Pre-processing before the lecture to anonymise the results
     # save_as_tab_separated('Mid-semester feedback.csv')
