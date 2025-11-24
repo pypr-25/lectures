@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 import os
 
-plt.rcParams.update({'font.size': 12})
+plt.rcParams.update({'font.size': 22})
 
 # What we want to do:
 # 1. Adapt functions from week 7 workshop to return Pandas dataframe
@@ -45,6 +45,7 @@ def get_weather_data(city_name, frequency, variables):
         data = pd.DataFrame(r.json()['hourly'])
         data.to_csv(filename, index=False)
     else:
+        print('We already have the file!')
         data = pd.read_csv(filename)
 
     # Make sure the time column values are proper datetime objects
@@ -64,30 +65,30 @@ if __name__ == '__main__':
     # sns.relplot(data=edinburgh_data, x='time', y='temperature_2m', kind='line')
     # plt.show()
 
-    sns.relplot(data=edinburgh_data, x='time', y='temperature_2m', hue='cloud_cover', size='cloud_cover')
-    plt.show()
+    # sns.relplot(data=edinburgh_data, x='time', y='temperature_2m', hue='cloud_cover', size='cloud_cover', aspect=5)
+    # plt.show()
 
-    # Plot temperature and cloud cover in 2 separate subplots
+    # # Plot temperature and cloud cover in 2 separate subplots
 
-    # First: convert to long format
-    print('Before converting to long format:\n', edinburgh_data)
-    edinburgh_data_long = pd.melt(edinburgh_data, id_vars=['time'], value_vars=['temperature_2m', 'cloud_cover'])
-    print('After converting to long format:\n', edinburgh_data_long)
+    # # First: convert to long format
+    # print('Before converting to long format:\n', edinburgh_data)
+    # edinburgh_data_long = pd.melt(edinburgh_data, id_vars=['time'], value_vars=['temperature_2m', 'cloud_cover'])
+    # print('After converting to long format:\n', edinburgh_data_long)
 
-    sns.relplot(data=edinburgh_data_long, x='time', y='value', col='variable')
-    plt.show()
-
-    # Try this: this now plots temperature and cloud cover in 1 figure,
-    # with different colours for the 2 different variables in 'variable'.
-    # Make sure you understand the difference with the first plot before
-    # we used pd.melt()!
     # sns.relplot(data=edinburgh_data_long, x='time', y='value', hue='variable')
+    # plt.show()
 
-    # Exercises:
-    # - Add more weather variables
-    # - Incorporate the units in the labels/titles
-    # - Get data for another city, merge it with first city, plot
-    #     data for the 2 cities in the same figure
+    # # Try this: this now plots temperature and cloud cover in 1 figure,
+    # # with different colours for the 2 different variables in 'variable'.
+    # # Make sure you understand the difference with the first plot before
+    # # we used pd.melt()!
+    # # sns.relplot(data=edinburgh_data_long, x='time', y='value', hue='variable')
+
+    # # Exercises:
+    # # - Add more weather variables
+    # # - Incorporate the units in the labels/titles
+    # # - Get data for another city, merge it with first city, plot
+    # #     data for the 2 cities in the same figure
 
 
     ## Joining data for multiple cities
@@ -107,15 +108,15 @@ if __name__ == '__main__':
     edinburgh_data_gaps['city'] = 'Edinburgh'
     glasgow_data_gaps['city'] = 'Glasgow'
     edi_gla_data = pd.concat([edinburgh_data_gaps, glasgow_data_gaps])
-    print(edi_gla_data.head())
+    # print(edi_gla_data)
 
     # Create 2 subplots, one for each city
-    sns.relplot(data=edi_gla_data, x='time', y='temperature_2m', hue='cloud_cover', size='cloud_cover', col='city')
-    plt.show()
+    # sns.relplot(data=edi_gla_data, x='time', y='temperature_2m', hue='cloud_cover', size='cloud_cover', col='city')
+    # plt.show()
 
-    # We could also merge the 2 dataframes like this (try the different ways and spot which times are missing!)
-    # How you choose to join dataframes depends on what you need to do with the data after.
-    # edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on='time', suffixes=['_edi', '_gla'])
-    # edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on='time', suffixes=['_edi', '_gla'], how='right')
-    edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on=['time', 'city'], suffixes=['_edi', '_gla'], how='outer')
-    print(edi_gla_data.head())
+    # # We could also merge the 2 dataframes like this (try the different ways and spot which times are missing!)
+    # # How you choose to join dataframes depends on what you need to do with the data after.
+    edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on='time', suffixes=['_edi', '_gla'])
+    # # edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on='time', suffixes=['_edi', '_gla'], how='right')
+    # edi_gla_data = edinburgh_data_gaps.merge(glasgow_data_gaps, on=['time', 'city'], suffixes=['_edi', '_gla'], how='outer')
+    print(edi_gla_data)
